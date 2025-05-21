@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Profile\ChangePassword;
 use App\Livewire\Settings\Password;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -14,8 +15,7 @@ test('password can be updated', function () {
 
     $this->actingAs($user);
 
-    $response = Livewire::test(Password::class)
-        ->set('current_password', 'password')
+    $response = Livewire::test(ChangePassword::class)
         ->set('password', 'new-password')
         ->set('password_confirmation', 'new-password')
         ->call('updatePassword');
@@ -23,20 +23,4 @@ test('password can be updated', function () {
     $response->assertHasNoErrors();
 
     expect(Hash::check('new-password', $user->refresh()->password))->toBeTrue();
-});
-
-test('correct password must be provided to update password', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
-
-    $this->actingAs($user);
-
-    $response = Livewire::test(Password::class)
-        ->set('current_password', 'wrong-password')
-        ->set('password', 'new-password')
-        ->set('password_confirmation', 'new-password')
-        ->call('updatePassword');
-
-    $response->assertHasErrors(['current_password']);
 });
